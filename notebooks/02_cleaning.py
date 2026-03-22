@@ -26,20 +26,27 @@ print("Saved: clean_sequences.fasta")
 print("Saved: qc_summary.csv")
 
 # %%
-# Plot GC content and sequence lenghts
-fig, axes = plt.subplots(1,2,figsize = (15,5))
+# Bar charts — meaningful for small number of sequences
+fig, axes = plt.subplots(2, 1, figsize=(14, 8))
 
-qc_df['gc_pct'].plot.hist(ax = axes[0],bins = 20,color='steelblue', edgecolor='white')
-axes[0].set_title("GC content Distribution")
-axes[0].set_xlabel("GC %")
+# GC% per sequence
+axes[0].bar(qc_df['id'], qc_df['gc_pct'], color='steelblue', edgecolor='white')
+axes[0].set_title("GC Content per TP53 Transcript")
+axes[0].set_ylabel("GC %")
+axes[0].tick_params(axis='x', rotation=90)
+axes[0].axhline(y=qc_df['gc_pct'].mean(), color='red', linestyle='--', label='mean')
+axes[0].legend()
 
-qc_df['length'].plot.hist(ax= axes[1], bins = 20, color='seagreen', edgecolor='white')
-axes[1].set_title("Sequence Length Distribution")
-axes[1].set_xlabel("Length (bp)")
+# Length per sequence
+axes[1].bar(qc_df['id'], qc_df['length'], color='seagreen', edgecolor='white')
+axes[1].set_title("Sequence Length per TP53 Transcript")
+axes[1].set_ylabel("Length (bp)")
+axes[1].tick_params(axis='x', rotation=90)
+axes[1].axhline(y=qc_df['length'].mean(), color='red', linestyle='--', label='mean')
+axes[1].legend()
 
 plt.tight_layout()
-plt.savefig("../results/figures/qc_distributions.png", dpi = 150)
+plt.savefig("../results/figures/qc_distributions.png", dpi=150)
 plt.show()
 print("Saved: qc_distributions.png")
-
 # %%

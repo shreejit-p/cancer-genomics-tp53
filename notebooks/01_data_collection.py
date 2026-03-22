@@ -16,7 +16,7 @@ Entrez.email = "shreejit.data@gmail.com"
 search_handle = Entrez.esearch(
     db="nucleotide",
     term="TP53[Gene] AND Homo sapiens[Organism] AND mRNA[Filter] AND RefSeq[Filter]",
-    retmax=10
+    retmax=100
 )
 search_results = Entrez.read(search_handle)
 search_handle.close()
@@ -53,3 +53,5 @@ print("Total Sequences:", len(sequences))
 
 for seq in sequences:
     print(f"ID: {seq.id}  |  Length: {len(seq)}")
+
+    #%%
