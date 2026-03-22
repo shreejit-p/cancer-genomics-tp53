@@ -1,5 +1,5 @@
 from Bio import SeqIO
-from BioSeqUtils import gc_fraction
+from Bio.SeqUtils import gc_fraction
 import pandas as pd
 import logging
 
