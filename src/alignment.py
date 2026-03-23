@@ -21,7 +21,7 @@ def run_mafft(input_fasta, output_fasta):
     with open(output_fasta, "w") as out:
         subprocess.run(cmd, stdout = out, stderr=subprocess.DEVNULL, check= True)
     
-    alignment = Align.IO.read(output_fasta, "fasta")
+    alignment = AlignIO.read(output_fasta, "fasta")
     logger.info(f"Alignment complete: {len(alignment)} sequences, {alignment.get_alignment_length()} columns")
 
     return alignment
