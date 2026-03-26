@@ -3,7 +3,7 @@ import pandas as pd
 
 # Load all results
 qc_df = pd.read_csv("/home/dragonfly/cancer-genomics-tp53/results/qc_summary.csv")
-mut_df = pd.read_csv("/home/dragonfly/cancer-genomics-tp53/results/mutations.csv")
+mut_df = pd.read_csv("/home/dragonfly/cancer-genomics-tp53/results/mutations_filtered.csv")
 annotated_df = pd.read_csv("/home/dragonfly/cancer-genomics-tp53/results/mutations_annotated.csv")
 
 # Summary

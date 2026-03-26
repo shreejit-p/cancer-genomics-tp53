@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 # %%
 # Load mutations from previous step
-mut_df = pd.read_csv("../results/mutations.csv")
+mut_df = pd.read_csv("../results/mutations_filtered.csv")
 print(f"Loaded {len(mut_df)} mutations")
 print(mut_df.head())
 

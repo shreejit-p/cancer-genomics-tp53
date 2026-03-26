@@ -11,7 +11,7 @@ import pandas as pd
 
 # %%
 # Load results
-mut_df = pd.read_csv("../results/mutations.csv")
+mut_df = pd.read_csv("../results/mutations_filtered.csv")
 qc_df = pd.read_csv("../results/qc_summary.csv")
 print(f"Mutations loaded: {len(mut_df)}")
 print(f"Sequences loaded: {len(qc_df)}")

@@ -106,3 +106,26 @@ def classify_effect(ref_seq, pos, alt_base):
     if aa_mut == '*':
         return "nonsense"
     return "missense"
+
+def filter_first_stop(mut_df):
+    """
+    For each sample, only keep mutations before the first stop codon.
+    After a nonsense mutation the rest of protein doesn't exist.
+    """
+    filtered = []
+
+    for sample_id in mut_df['sample_id'].unique():
+        sample_muts = mut_df[mut_df['sample_id'] == sample_id].copy()
+        sample_muts = sample_muts.sort_values('position')
+
+        # Find first nonsense position
+        nonsense = sample_muts[sample_muts['effect'] == 'nonsense']
+
+        if len(nonsense) > 0:
+            first_stop = nonsense['position'].min()
+            # Keep only mutations before or at first stop
+            sample_muts = sample_muts[sample_muts['position'] <= first_stop]
+
+        filtered.append(sample_muts)
+
+    return pd.concat(filtered).reset_index(drop=True)

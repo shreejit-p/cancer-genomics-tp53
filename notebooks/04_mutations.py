@@ -19,8 +19,12 @@ print(f"Total mutations detected: {len(mut_df)}")
 print(mut_df.head(10))
 
 # %%
-# Save mutations to CSV
-mut_df.to_csv("../results/mutations.csv", index=False)
+# Filter mutations after first stop codon
+from mutations import filter_first_stop
+mut_df_filtered = filter_first_stop(mut_df)
+print(f"Before filtering: {len(mut_df)}")
+print(f"After filtering: {len(mut_df_filtered)}")
+mut_df_filtered.to_csv("../results/mutations_filtered.csv", index=False)
 print("Saved: mutations.csv")
 
 # %%

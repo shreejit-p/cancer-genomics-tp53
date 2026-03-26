@@ -10,30 +10,34 @@ and MAFFT.
 
 TP53 (tumor protein p53) is the most frequently mutated gene in human cancers,
 altered in approximately 50% of all cases. It acts as a tumor suppressor by
-regulating cell cycle arrest, DNA repair, and apoptosis. Mutations in TP53
+regulating cell cycle arrest, DNA repair, and apoptosis. Mutations in TP53,
 particularly in its DNA binding domain, disrupt these functions and drive
 cancer progression.
 
 This pipeline analyzes all 25 validated TP53 transcript variants from NCBI
 RefSeq to characterize sequence differences, detect mutations, and annotate
-their clinical significance.
+their clinical significance against the canonical reference NM_000546.6.
 
 ---
 
 ## Pipeline Overview
 ```
-NCBI RefSeq
-    ↓
-Data Collection (BioPython Entrez)
-    ↓
-Quality Control (GC%, length, N-base filtering)
-    ↓
-Multiple Sequence Alignment (MAFFT)
-    ↓
+NCBI RefSeq (25 TP53 transcripts)
+        ↓
+Data Collection — BioPython Entrez
+        ↓
+Quality Control — GC%, length, N-base filtering
+        ↓
+Deduplication — remove identical sequences
+        ↓
+Multiple Sequence Alignment — MAFFT
+        ↓
 Mutation Detection & Classification
-    ↓
+        ↓
+Post-stop codon filtering
+        ↓
 ClinVar Annotation
-    ↓
+        ↓
 Publication Quality Visualizations
 ```
 
@@ -43,33 +47,69 @@ Publication Quality Visualizations
 
 | Metric | Value |
 |---|---|
-| Transcripts analyzed | 25 |
+| Transcripts fetched | 25 |
 | Transcripts passing QC | 25 (100%) |
 | GC content range | 50.94% — 53.59% |
 | Alignment length | 2886 bp |
-| Total variants detected | 5693 |
-| SNPs | 172 |
-| Deletions | 3444 |
-| Insertions | 2077 |
-| Missense mutations | 137 |
-| Nonsense mutations | 4 |
-| Silent mutations | 2108 |
+| Total variants detected | 5377 |
+| SNPs | 138 |
+| Deletions | 3428 |
+| Insertions | 1811 |
+| Missense mutations | 111 |
+| Nonsense mutations | 2 |
+| Silent mutations | 1836 |
+| Variants found in ClinVar | 138/138 |
 
-### Key Findings
+---
 
-- All 25 TP53 transcript variants passed quality control with highly
-  consistent GC content (50.94—53.59%), confirming data integrity
-- The majority of variants between transcripts are deletions (3444) and
-  insertions (2077), reflecting alternative splicing of TP53 exons rather
-  than cancer-driving point mutations
-- 172 SNPs were detected across all transcript comparisons against the
-  canonical reference NM_000546.6
-- 4 nonsense mutations were identified creating premature stop codons,
-  representing the most clinically significant findings
-- 137 missense mutations were detected that result in amino acid changes
-  in the TP53 protein
-- Variants were cross-referenced with ClinVar and exported in standard
-  VCF 4.2 format for compatibility with downstream genomic tools
+## Key Findings
+
+**1. High sequence conservation across all transcripts**
+All 25 TP53 transcripts passed QC with GC content ranging narrowly
+from 50.94% to 53.59% — confirming these are high quality, biologically
+consistent sequences from the same gene locus.
+
+**2. Splicing differences dominate the variant landscape**
+The majority of detected variants are deletions (3428) and insertions (1811),
+reflecting alternative splicing of TP53 exons rather than point mutations.
+This is expected as we are comparing transcript variants not tumor samples.
+
+**3. Most divergent transcripts**
+NM_001126116.2 and NM_001276698.3 showed the highest mutation counts
+(642 each) against the canonical reference, indicating these represent
+the most alternatively spliced TP53 variants.
+
+**4. Missense mutations detected**
+111 missense mutations were detected across all transcript comparisons,
+representing amino acid changes relative to the canonical TP53 protein.
+
+**5. Nonsense mutations at codon 32**
+2 nonsense mutations were identified in transcripts NM_001407271.1 and
+NM_001407270.1 at codon 32, causing premature protein truncation.
+These likely reflect alternative transcription start sites rather than
+pathogenic variants, as they occur in the divergent 5' regions of these
+transcripts compared to NM_000546.6.
+
+**6. ClinVar annotation**
+All 138 detected SNPs returned ClinVar hits. This likely reflects the
+broad nature of our gene-level ClinVar query rather than exact variant
+matches — a known limitation of this annotation approach. Future work
+should implement position-specific HGVS notation queries for precise
+clinical significance matching.
+
+---
+
+## Visualizations
+
+| Figure | Description |
+|---|---|
+| qc_distributions.png | GC% and length per transcript |
+| gc_comparison.png | GC content with QC pass/fail coloring |
+| mutation_distribution.png | Mutation types and effects breakdown |
+| mutations_per_sample.png | Mutation count per transcript |
+| lollipop_tp53.png | Mutation landscape across TP53 protein |
+| mutation_heatmap.png | Heatmap of mutations across all transcripts |
+| clinvar_coverage.png | ClinVar annotation coverage |
 
 ---
 
@@ -80,13 +120,13 @@ cancer-genomics-tp53/
 │                              # regenerate by running notebook 01
 ├── notebooks/
 │   ├── 01_data_collection.py  # fetch TP53 sequences from NCBI
-│   ├── 02_cleaning.py         # QC filtering and stats
+│   ├── 02_cleaning.py         # QC filtering and deduplication
 │   ├── 03_alignment.py        # MAFFT multiple sequence alignment
 │   ├── 04_mutations.py        # mutation detection and classification
 │   ├── 05_annotation.py       # ClinVar annotation and VCF export
 │   └── 06_visualization.py    # publication quality figures
 ├── src/
-│   ├── cleaning.py            # QC filtering functions
+│   ├── cleaning.py            # QC filtering and deduplication functions
 │   ├── alignment.py           # MAFFT wrapper functions
 │   ├── mutations.py           # mutation detection and classification
 │   ├── annotation.py          # ClinVar API and VCF writer
@@ -112,6 +152,21 @@ cancer-genomics-tp53/
 
 ---
 
+## Limitations & Future Work
+
+- ClinVar annotation uses gene-level queries — future work should
+  implement exact HGVS notation for precise variant matching
+- Analysis compares transcript variants not tumor vs normal samples —
+  integrating TCGA controlled access data would enable true somatic
+  mutation analysis
+- Nonsense mutations at codon 32 require manual validation to confirm
+  whether they represent true pathogenic variants or alternative
+  transcription start sites
+- Deduplication based on exact sequence identity — future work could
+  use sequence similarity clustering (CD-HIT) for more robust deduplication
+
+---
+
 ## Setup & Reproduction
 ```bash
 # Clone repository
@@ -125,16 +180,15 @@ source venv/bin/activate
 # Install Python dependencies
 pip install -r requirements.txt
 
-# Install MAFFT (required for alignment)
-sudo apt install mafft        # Linux
-brew install mafft            # Mac
+# Install MAFFT
+sudo apt install mafft
 
 # Run notebooks in order in VS Code
 # Each notebook depends on output of previous one
 01_data_collection.py  →  fetches data from NCBI
-02_cleaning.py         →  filters sequences
+02_cleaning.py         →  QC filtering and deduplication
 03_alignment.py        →  runs MAFFT alignment
-04_mutations.py        →  detects mutations
+04_mutations.py        →  detects and filters mutations
 05_annotation.py       →  annotates with ClinVar
 06_visualization.py    →  generates all figures
 ```
@@ -165,21 +219,9 @@ brew install mafft            # Mac
 
 ---
 
-## Output Files
-
-| File | Description |
-|---|---|
-| qc_summary.csv | QC stats for all 25 sequences |
-| alignment_summary.csv | Gap analysis per transcript |
-| mutations.csv | All 5693 detected variants |
-| mutations_annotated.csv | Variants with ClinVar annotation |
-| mutations.vcf | Variants in standard VCF 4.2 format |
-
----
-
 ## Ethical Considerations
 
-- Only publicly available, de-identified data used
+- Only publicly available de-identified data used
 - No controlled access TCGA data used
 - All sequences sourced from open NCBI RefSeq database
 - ClinVar data accessed via public API within NCBI usage guidelines
